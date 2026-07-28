@@ -263,4 +263,4 @@ for (event, inventory, description) in events {
 //:
 //: ---
 //:
-//: [Next: Summary](@next)
+//: [Next: Vending Machine](@next)

@@ -1,0 +1,7 @@
+# Xcode user + build state — keep the project sources, ignore the noise.
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.xcworkspace/xcuserdata/
+.DS_Store
