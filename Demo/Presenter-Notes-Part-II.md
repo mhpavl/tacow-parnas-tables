@@ -8,7 +8,7 @@ Read straight through to practice out loud, or have your phone read it aloud
 to deliver. Live-demo prompts are folded in where you paste them, and collected in
 full in the [Demo Prompts appendix](#appendix--the-five-live-demo-prompts).
 
-- **Deck:** `Demo/TACOW - Parnas Tables Part II (Xcode 27).pptx` (15 slides)
+- **Deck:** `Demo/TACOW - Parnas Tables Part II (Xcode 27).pptx` (16 slides)
 - **Rough runtime:** ~20–25 min, with the live Xcode 27 build (~12 min) landing over slides 10–13
 - **The whole talk in one line:** co-design a formal spec with an AI agent, review the *table*, and let Xcode 27 build the app from it — formal methods as the fast path, not overhead.
 
@@ -231,7 +231,23 @@ four lines.
 
 ---
 
-## Slide 15 — Close
+## Slide 15 — The bigger picture: why this is the fast path
+
+**On screen:** Four cards — (1) Loop "engineering" is so last week · (2) Fewer tokens, not more (planet + 💰) · (3) Flixel Flipside, built in 2 weeks · (4) Xcode 27 supercharges it.
+
+**Say:**
+One more beat before we close — the bigger picture. First: loop "engineering" is
+already last week. The win isn't making the agent grind harder in a retry loop; it's a
+reviewed spec that's correct by construction. Second: this *minimizes* token use instead
+of maximizing it — a tight table constrains the agent, so less back-and-forth and less
+waste. Better for the planet and the budget. Third, proof it's real: we built Flixel
+Flipside with exactly these methods in two weeks. Fourth: Xcode 27's agentic coding
+supercharges all of it — the reviewed spec becomes a first-class, editable plan. That's
+the payoff: spec-first isn't just cleaner, it's cheaper, faster, and already shipping.
+
+---
+
+## Slide 16 — Close
 
 **On screen:** Tables in. Verified specs out. Apps that match, by construction. Consulting & training · mhp@flixel.com.
 
