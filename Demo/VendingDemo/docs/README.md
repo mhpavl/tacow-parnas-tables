@@ -1,6 +1,7 @@
 # From Parnas Table → State Machine → App (with Xcode 27)
 
-A follow-on segment to the November 2025 tacow talk *"Parnas Tables in Swift."*
+The demo segment from **Part II — "Parnas Tables, Part Deux"** (tacow, July 28, 2026),
+a follow-on to the November 2025 talk *"Parnas Tables in Swift."*
 The original talk ended at **Example 3: an Order Processing State Machine** — showing
 that state machines fall naturally out of tabular notation. This segment turns that
 idea into a live, end-to-end story:
@@ -12,6 +13,9 @@ The punchline ties directly back to the thesis of the original talk:
 **you review the *table*, not the code.** And in Xcode 27 that's now literally how
 the tool works — the agent's plan is an editable Markdown artifact you approve
 *before* it writes a line of Swift.
+
+The app that came out of it is checked in one level up, in
+[`../VendingDemo/`](../VendingDemo/) — see [Where the code lives](#where-the-code-lives).
 
 ---
 
@@ -49,6 +53,9 @@ The full spec is in [`VendingMachine-Spec.md`](VendingMachine-Spec.md).
 Swap it for any small machine (media player, ticket/kanban flow) — the segment
 structure is identical.
 
+The same machine is also an executable page in the Part I playground:
+[`Playground/ParnasTables.playground` → *5 - Example 4 - Vending Machine*](../../../Playground/ParnasTables.playground).
+
 ---
 
 ## What Xcode 27 brings (verified June–July 2026)
@@ -82,18 +89,76 @@ Sources:
 
 ---
 
-## Files in this folder
+## Where the code lives
+
+The repo now holds the **result** of the demo, not just the starting point. Layout:
+
+```
+Demo/VendingDemo/
+├─ VendingDemo.xcodeproj
+├─ VendingDemo/                 ← the app, as the agent left it (the AFTER state)
+│  ├─ VendingMachine.swift      ← 14-row table → one switch case per row, + 5% fee
+│  ├─ VendingViewModel.swift    ← owns inventory; `send(_:)` is the only mutation path
+│  ├─ ContentView.swift         ← the driving UI (display, products, coins, cancel)
+│  └─ VendingDemoApp.swift
+└─ docs/                        ← you are here
+   ├─ README.md
+   ├─ VendingMachine-Spec.md
+   ├─ Xcode27-Setup.md
+   ├─ Xcode27-Script.md
+   └─ Reference/                ← the hand-written answer key (see caveat below)
+```
+
+Verified `BUILD SUCCEEDED` on **Xcode 27 (27A5228h)** for the iOS Simulator
+(iPhone 16), deployment target iOS 17.
+
+**The slides for this segment are a PDF, one level up in the repo:**
+[`Slides/tacow - Parnas tables part 2 - Xcode agent gen.pdf`](../../../Slides/tacow%20-%20Parnas%20tables%20part%202%20-%20Xcode%20agent%20gen.pdf)
+(19 slides). The earlier `.pptx` draft has been dropped.
+
+### Documents in this folder
 
 | File | Purpose |
 |------|---------|
-| [`TACOW - Parnas Tables Part II (Xcode 27).pptx`](TACOW%20-%20Parnas%20Tables%20Part%20II%20%28Xcode%2027%29.pptx) | The **slides** for this segment (14 slides, presenter notes on every slide). Built as `.pptx` — **open in Keynote** and restyle to match your existing deck. |
 | [`VendingMachine-Spec.md`](VendingMachine-Spec.md) | The plain-English brief + the Parnas table + completeness/disjointness check. The thing you co-build with the assistant. |
 | [`Xcode27-Setup.md`](Xcode27-Setup.md) | **Demo runbook** — how to open the project, configure the Xcode 27 assistant, verify its agent capabilities, run the demo, and fall back. Includes a pre-flight checklist. |
 | [`Xcode27-Script.md`](Xcode27-Script.md) | Beat-by-beat live-demo script: the exact prompts to give the agent, what to say, and the fallback if the network/agent misbehaves. |
-| [`VendingDemo/`](VendingDemo/) | A minimal SwiftUI **starter Xcode project** (the "before" state the agent builds into). Verified `BUILD SUCCEEDED` on Xcode 27 for the simulator. |
-| [`Reference/VendingMachine.swift`](Reference/VendingMachine.swift) | The model the agent *should* produce — exhaustive `switch`, one row per table line. Your stage-safe backup / answer key. |
-| [`Reference/ContentView.swift`](Reference/ContentView.swift) | The SwiftUI screen that drives the machine. Backup / answer key. Builds cleanly when swapped into `VendingDemo/`. |
+| [`Reference/VendingMachine.swift`](Reference/VendingMachine.swift) | A hand-written model written *before* the demo, against the 9-row table: exhaustive `switch`, one row per table line. Answer key / discussion piece. |
+| [`Reference/ContentView.swift`](Reference/ContentView.swift) | A hand-written SwiftUI screen (with its own `VendingMachineModel`) that drives that model. |
 
-**Stage insurance:** the `Reference/` files are a working implementation. If the
-live agent stalls, paste these in and keep the story moving — the point of the talk
-is the *table*, not whether the demo gods are kind.
+### Re-running the demo from the "before" state
+
+`Demo/VendingDemo/VendingDemo/` is now the finished app, so if you want the empty
+starter the agent builds *into*, restore it from the commit that introduced it:
+
+```bash
+git show 298e4f6:Demo/VendingDemo/VendingDemo/ContentView.swift > /tmp/starter-ContentView.swift
+# then, on a scratch branch:
+git checkout 298e4f6 -- Demo/VendingDemo/VendingDemo/ContentView.swift
+rm Demo/VendingDemo/VendingDemo/VendingMachine.swift Demo/VendingDemo/VendingDemo/VendingViewModel.swift
+```
+
+That leaves a placeholder "Vending Machine" screen that builds and runs — the
+**BEFORE** state described in [`Xcode27-Setup.md`](Xcode27-Setup.md).
+
+### Caveat on `Reference/` as a paste-in fallback
+
+The `Reference/` files predate the demo and use **different type names and a
+different shape** than the shipped app (`VendingState`/`VendingEvent` vs `State`/`Event`,
+`Coin` enum, `[Output]` instead of a single `Output`, no convenience fee, and no
+separate view model). They are a complete working implementation *on their own*, but
+they will **not** compile alongside `VendingViewModel.swift` — copying them in means
+removing that file too:
+
+```bash
+rm Demo/VendingDemo/VendingDemo/VendingViewModel.swift
+cp Demo/VendingDemo/docs/Reference/VendingMachine.swift Demo/VendingDemo/VendingDemo/
+cp Demo/VendingDemo/docs/Reference/ContentView.swift    Demo/VendingDemo/VendingDemo/
+```
+
+The folder is a **synchronized group**, so the files are picked up automatically —
+no "add to target" step.
+
+**Stage insurance:** either fallback works — the `Reference/` pair, or simply the
+shipped app on `main`. If the live agent stalls, keep the story moving; the point of
+the talk is the *table*, not whether the demo gods are kind.

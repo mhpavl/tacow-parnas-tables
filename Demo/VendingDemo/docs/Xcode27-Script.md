@@ -7,7 +7,7 @@ Timings assume ~12 minutes. Fallbacks in every risky beat.
 > **Setup before you walk on stage**
 > - New SwiftUI app project open, empty `ContentView`. Simulator pre-booted.
 > - Assistant model set (Anthropic/OpenAI/Google — your call) and signed in.
-> - `Demo/Reference/*.swift` open in another tab (hidden) as the answer key.
+> - `Demo/VendingDemo/docs/Reference/*.swift` open in another tab (hidden) as the answer key.
 > - Network tested. Have a phone hotspot as backup.
 > - Optional: run `xcrun agent skills export` beforehand so you can show the
 >   *SwiftUI Specialist* skill as "Apple's own formal spec for the agent."
@@ -133,9 +133,14 @@ This proves the whole thesis. Paste:
 ```
 New requirement: the machine should also charge a 5% "convenience fee" — a product
 is only dispensable if balance >= price * 1.05, and change is computed against that
-total. Update the Parnas table FIRST (show me the changed rows 5 and 6), then update
-transition(...) to match, then rebuild.
+total. Update the Parnas table FIRST (show me the changed rows for
+(Collecting, selectProduct)), then update transition(...) to match, then rebuild.
 ```
+
+> Those are rows 5–6 of the 9-row table in [`VendingMachine-Spec.md`](VendingMachine-Spec.md) §2,
+> and rows 6–7 of the expanded 14-row table the shipped app implements. Both land in
+> the same place: a single `requiredTotal(forPrice:)` that the affordability guard and
+> the change calculation share, so they can't disagree.
 
 Say: *"I changed the **spec**. The table row moved; the code followed; the compiler
 kept us honest; the app just works. That's the payoff — the table is the source of

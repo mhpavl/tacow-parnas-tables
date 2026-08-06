@@ -3,22 +3,28 @@
 Everything you need to actually run the "table → app" demo on stage. Pair this with
 the prompt-by-prompt choreography in [`Xcode27-Script.md`](Xcode27-Script.md).
 
-> **Status:** the starter project in [`VendingDemo/`](VendingDemo/) and the
+> **Status:** the app in [`../VendingDemo/`](../VendingDemo/) and the
 > stage-backup [`Reference/`](Reference/) files were **both built with Xcode 27
 > (27A5228h) for the iOS Simulator — `BUILD SUCCEEDED`.** So the failsafe is known-good;
 > only the live agent portion depends on the demo gods.
+>
+> **Note:** `../VendingDemo/` now holds the **finished** app (the AFTER state — state
+> machine, view model, driving UI, 5% convenience fee). To demo from the empty
+> starter again, restore it as described in [`README.md`](README.md#re-running-the-demo-from-the-before-state).
 
 ---
 
 ## 1. Get the project open (pick one)
 
-### Option A — use the provided starter (fastest) ✅ verified
+### Option A — use the provided project (fastest) ✅ verified
 ```bash
 open "Demo/VendingDemo/VendingDemo.xcodeproj"
 ```
 - Target `VendingDemo`, scheme `VendingDemo`, iOS 17+, bundle id `com.tacow.VendingDemo`.
-- It builds and runs as-is: a placeholder "Vending Machine" start screen. That's the
-  **BEFORE** state — the agent fills in the state machine and the real UI.
+- It builds and runs as-is — but on `main` it is the **AFTER** state (the finished
+  vending app). Roll it back to the placeholder start screen first if you want the
+  **BEFORE** state: see
+  [`README.md`](README.md#re-running-the-demo-from-the-before-state).
 - Pick a simulator (e.g. iPhone 16) and hit **⌘R** once before the talk to warm it up.
 
 ### Option B — create fresh in ~30 seconds (failsafe you fully control)
@@ -85,13 +91,18 @@ If the agent stalls, the network drops, or output goes sideways — paste the ve
 reference files and keep the story moving:
 
 ```bash
-# copy the known-good implementation into the project's source folder
-cp Demo/Reference/VendingMachine.swift Demo/VendingDemo/VendingDemo/
-cp Demo/Reference/ContentView.swift    Demo/VendingDemo/VendingDemo/
+# the Reference pair replaces BOTH the model and the UI — and their type names
+# differ from the shipped app, so VendingViewModel.swift must go with them
+rm Demo/VendingDemo/VendingDemo/VendingViewModel.swift
+cp Demo/VendingDemo/docs/Reference/VendingMachine.swift Demo/VendingDemo/VendingDemo/
+cp Demo/VendingDemo/docs/Reference/ContentView.swift    Demo/VendingDemo/VendingDemo/
 ```
-Because the folder is a **synchronized group**, the new file is picked up
-automatically — no "add to target" step. Build & run. (This exact swap is the one
-verified above.)
+Because the folder is a **synchronized group**, the new files are picked up
+automatically — no "add to target" step. Build & run.
+
+Simpler alternative now that the finished app is checked in: just `git checkout main --
+Demo/VendingDemo/VendingDemo/` and run *that*. It's the 14-row table with the
+convenience fee, i.e. the end state of every beat.
 
 The talk's point is the **table**, not whether the live generation is flawless. The
 fallback lets you land every beat regardless.

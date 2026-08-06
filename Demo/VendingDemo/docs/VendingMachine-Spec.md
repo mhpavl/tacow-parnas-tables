@@ -88,3 +88,48 @@ partition a *thing you can point at* — and the generated Swift maps one row �
 
 See [`Reference/VendingMachine.swift`](Reference/VendingMachine.swift) for the
 one-row-per-case implementation.
+
+---
+
+## 5. What the shipped app actually implements
+
+The table above is the **starting** artifact — the 9-row version you and the assistant
+produce in Beats 1–2. The app checked in at
+[`../VendingDemo/VendingMachine.swift`](../VendingDemo/VendingMachine.swift) is the
+version that survived the rest of the demo, and it differs in two ways worth knowing
+before you read it:
+
+1. **14 rows, not 9.** Taking §3's completeness argument literally, every one of the
+   12 (State × Event) cells gets its own labelled row — including the "ignore it"
+   cells — and the (Collecting, selectProduct) guard split adds two more. Nothing is
+   left to a blank cell or a `default`; the `switch` is over the whole
+   `(State, Event, StockStatus)` tuple.
+2. **A 5% convenience fee** (Beat 5 of [`Xcode27-Script.md`](Xcode27-Script.md)). The
+   affordability guard becomes `balance ≥ total(p)` and change is
+   `balance − total(p)`, where `total(p) = round(price × 1.05)`. Both rows call one
+   `requiredTotal(forPrice:)`, so the guard and the change can never disagree.
+
+Row map for the shipped version:
+
+| # | State | Event | Guard | New State | Output |
+|---|-------|-------|-------|-----------|--------|
+| 1 | Idle | insertCoin(c) | — | Collecting(c) | — |
+| 2 | Idle | selectProduct | — | Idle | insertCoinsFirst |
+| 3 | Idle | cancel | — | Idle | — |
+| 4 | Idle | dispenseComplete | — | Idle | — *(defensive no-op)* |
+| 5 | Collecting(b) | insertCoin(c) | — | Collecting(b+c) | — |
+| 6 | Collecting(b) | selectProduct(p) | inStock ∧ b ≥ total(p) | Dispensing(p) | dispense(p, change: b − total(p)) |
+| 7 | Collecting(b) | selectProduct(p) | inStock ∧ b < total(p) | Collecting(b) | insufficientFunds(shortfall) |
+| 8 | Collecting(b) | selectProduct(p) | ¬inStock | Collecting(b) | soldOut |
+| 9 | Collecting(b) | cancel | — | Idle | refund(b) |
+| 10 | Collecting(b) | dispenseComplete | — | Collecting(b) | — *(defensive no-op)* |
+| 11 | Dispensing(p) | insertCoin | — | Dispensing(p) | — *(coin slot locked)* |
+| 12 | Dispensing(p) | selectProduct | — | Dispensing(p) | — *(input ignored)* |
+| 13 | Dispensing(p) | cancel | — | Dispensing(p) | — *(cannot cancel mid-vend)* |
+| 14 | Dispensing(p) | dispenseComplete | — | Idle | vendComplete |
+
+Balance display moved out of the Outputs column: the balance is *already* in the state
+(`collecting(balance:)`), so the view derives it rather than the machine emitting a
+`showBalance`. Stock quantity is world state, not machine state — it lives in
+[`../VendingDemo/VendingViewModel.swift`](../VendingDemo/VendingViewModel.swift), which
+resolves the `StockStatus` guard before each transition.
